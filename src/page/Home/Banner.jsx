@@ -1,7 +1,7 @@
 const Banner = () => {
   return (
     <div className=" w-full sm:after:min-h-screen md:h-[550px]  bg-[#f4e5ec]">
-      <div className="grid md:flex justify-between items-center grid-cols-1 md:grid-cols-2">
+      <div className="flex flex-col md:flex-row">
         <div className="md:w-1/2 sm:after:w-full p-10 space-y-7">
           <h1 className=" uppercase text-red-500">up to 20% discount on</h1>
           <h1 className="text-4xl md:text-7xl  font-semibold">

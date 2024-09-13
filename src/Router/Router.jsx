@@ -5,6 +5,8 @@ import Categories from "../page/categorie/Categories";
 import Searchs from "../page/search/Searchs";
 import ShopPage from "../page/Shop/ShopPage";
 import SingleProduct from "../page/Shop/ProductDetails/SingleProduct";
+import Login from "../components/Login";
+import Register from "../components/Register";
 
 export const router = createBrowserRouter([
   {
@@ -31,6 +33,14 @@ export const router = createBrowserRouter([
           path:'/shop/:id',
           element : <SingleProduct />,
         },
+        {
+          path: '/login',
+          element: <Login />
+        },
+        {
+          path: '/register',
+          element: <Register />
+        }
         
     ]
   },
