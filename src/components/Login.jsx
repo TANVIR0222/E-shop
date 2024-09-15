@@ -1,15 +1,38 @@
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { useLoginUserMutation } from "../redux/features/auth/authApi";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+
+  const dispatch = useDispatch();
+  const [loginUser ,  { isLoading : loginLoading }] = useLoginUserMutation();
+
+  const navigat =  useNavigate();
+  
   const {
     register,
     handleSubmit,
-    watch,
+    reset,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
 
-  console.log(watch("example"));
+  const onSubmit = async (data) => {
+
+    const email =data.email;
+    const password = data.password;
+
+    try {
+       await  loginUser({email,password}).unwrap();
+       reset();
+       navigat('/')
+      alert('login success ')
+    } catch (error) {
+      console.log('login faild ', error);
+      
+    }
+  }
+
   return (
     <>
       <div className="flex justify-center items-center h-screen">
@@ -43,9 +66,6 @@ const Login = () => {
                 className="h-12 bg-gray-50 p-2 border rounded focus:outline-none"
                 {...register("password", {
                   required: true,
-                  maxLength: 20,
-                  minLength: 8,
-                  pattern: /^[A-Za-z]+$/i,
                 })}
               />
               {errors.password?.type === "required" && (
@@ -63,7 +83,7 @@ const Login = () => {
               </p>
             </div>
             <div className="form-control mt-5">
-              <button className="p-3 bg-black text-white rounded">Login</button>
+              <button type="submit" className="p-3 bg-black text-white rounded">Login</button>
             </div>
           </form>
         </div>
