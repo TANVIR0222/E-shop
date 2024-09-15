@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -6,9 +6,10 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Badge } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CartModel from "../page/Shop/CartModel";
-
+import { useLoginUserMutation, useLogoutUserMutation } from "../redux/features/auth/authApi";
+import { logout } from "../redux/features/auth/authSlice";
 
 const navItem = [
   { name: "Home", path: "/" },
@@ -23,14 +24,62 @@ const Navbar = () => {
   // cart fun
   const products = useSelector((state) => state.cart.products);
   const [isCartOpen, setisCartOpen] = useState(false);
-
   const handleCardTogole = () => {
     setisCartOpen(!isCartOpen);
   };
 
+  // show user login
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  console.log(user);
+
+  // dropdown menu
+  const [isDropdownOpen, setisDropdownOpen] = useState(false);
+
+  const handledropdown = () => {
+    setisDropdownOpen(!isDropdownOpen);
+  };
+
+  // admin dropdown menu
+  const adminDropdownMenu = [
+    { lable: "DashBorad", path: "/dashBorad/admin" },
+    { lable: "Manage Item", path: "/dashBorad/manage-products" },
+    { lable: "All orders", path: "/dashBorad/manage-order" },
+    { lable: "Add New Post", path: "/dashBorad/add-new-past" },
+  ];
+
+  // user dropdown menu
+  const userDropdownMenu = [
+    { lable: "DashBorad", path: "/dashBorad" },
+    { lable: "Profile", path: "/dashBorad/profile" },
+    { lable: "Payments", path: "/dashBorad/payments" },
+    { lable: "Orders ", path: "/dashBorad/orders" },
+  ];
+
+  // dropdown 
+  const dropdownMenu =
+    user?.role === "admin" ? [...adminDropdownMenu] : [...userDropdownMenu];
+
+
+
+  // logout 
+  const navigate = useNavigate();
+  const [logoutUser] = useLogoutUserMutation();
+  const handleLogout = async() =>{
+    
+    try {
+      await  logoutUser().unwrap();
+      dispatch(logout());
+      navigate('/')
+      
+    } catch (error) {
+      console.log(error, 'logout faild');
+    }
+  }
+
   return (
     <>
-      <header className=" bg-[#f4e5ec] my-3 border-black h-16 ">
+      <header className=" bg-slate-300  border-black h-24">
         <nav className="flex items-center  justify-between">
           <ul className=" sm:flex hidden mb-10 items-center gap-7">
             {navItem.map((item, index) => (
@@ -73,9 +122,38 @@ const Navbar = () => {
               </button>
             </span>
             <span>
-              <Link to={'/login'}>
-                <AccountCircleIcon color="primary" />
-              </Link>
+              {user ? (
+                <>
+                <img
+                  onClick={handledropdown}
+                  className=" size-7"
+                  src={user?.profileImage || "/avatar.png"}
+                  alt=""
+                />
+                {
+                  isDropdownOpen && (
+                    <div className="absolute md:right top-20 right-0  mt-3 w-48 border border-gray-200 rounded-lg z-20 bg-white p-4 shadow-md">
+                      <ul className=" font-medium space-y-4 p-2">
+                         {
+                          dropdownMenu.map((item,index) =>(
+                            <li  key={index}>
+                              <Link
+                              onClick={()=> setisDropdownOpen(false)}
+                               className="dropdown-item" to={`${item.path}`} >{item.lable}</Link>
+                            </li>
+                          ))
+                         }
+                         <Link className="nav__icons" onClick={handleLogout} >Logout</Link>
+                      </ul>
+                    </div>
+                  )
+                }
+                </>
+              ) : (
+                <Link to={"/login"}>
+                  <i className="ri-user-line"></i>
+                </Link>
+              )}
             </span>
           </div>
 
