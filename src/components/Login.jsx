@@ -2,14 +2,17 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useLoginUserMutation } from "../redux/features/auth/authApi";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import Swal from "sweetalert2";
+import { setUser } from "../redux/features/auth/authSlice";
 
 const Login = () => {
-
   const dispatch = useDispatch();
-  const [loginUser ,  { isLoading : loginLoading }] = useLoginUserMutation();
+  const [loginUser, { isLoading: loginLoading }] = useLoginUserMutation();
+  const [error, seterror] = useState("");
 
-  const navigat =  useNavigate();
-  
+  const navigat = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -18,28 +21,45 @@ const Login = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-
-    const email =data.email;
+    const email = data.email;
     const password = data.password;
 
     try {
-       await  loginUser({email,password}).unwrap();
-       reset();
-       navigat('/')
-      alert('login success ')
+      const res = await loginUser({ email, password }).unwrap();
+
+
+      // token set localstorage 
+      const {token , user } = res;
+      dispatch(setUser({user}))
+
+      reset();
+      if (res.message) {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Log in success ",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        navigat('/')
+      }
     } catch (error) {
-      console.log('login faild ', error);
-      
+      console.log("login faild ", error);
+      seterror(error);
     }
-  }
+  };
 
   return (
     <>
       <div className="flex justify-center items-center h-screen">
         <div className="card bg-base-100 w-full  max-w-sm shrink-0 shadow-2xl">
-          <h2 className=" text-2xl text-center font-semibold pt-5">
-            Please Login
-          </h2>
+          {loginLoading ? (
+            <span className="loading mx-auto text-blue-600 loading-infinity loading-lg"></span>
+          ) : (
+            <h2 className=" text-2xl text-center font-semibold pt-5">
+              Please Login
+            </h2>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="card-body">
             <div className="form-control">
@@ -82,8 +102,16 @@ const Login = () => {
                 here
               </p>
             </div>
+            {error && (
+              <p className="text-red-600 text-sm  italic">
+                {error.data.message}{" "}
+              </p>
+            )}
+
             <div className="form-control mt-5">
-              <button type="submit" className="p-3 bg-black text-white rounded">Login</button>
+              <button type="submit" className="p-3 bg-black text-white rounded">
+                Login
+              </button>
             </div>
           </form>
         </div>
