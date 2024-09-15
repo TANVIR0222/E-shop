@@ -1,22 +1,53 @@
 import { useForm } from "react-hook-form";
+import { useRegisterUserMutation } from "../redux/features/auth/authApi";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Register = () => {
+  const [registerUser, { isLoading: RegisterLoading }] =
+    useRegisterUserMutation();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
-    watch,
+    reset,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = async (data) => {
+    const username = data.username;
+    const email = data.email;
+    const password = data.password;
 
-  console.log(watch("example"));
+    try {
+      const res = await registerUser({ username, email, password }).unwrap();
+      reset();
+      if (res.message) {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Register success ",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("register falid");
+    }
+  };
+
   return (
     <>
       <div className="flex justify-center items-center h-screen">
         <div className="card bg-base-100 w-full  max-w-sm shrink-0 shadow-2xl">
-          <h2 className=" text-2xl text-center font-semibold pt-5">
-            Please Register
-          </h2>
+          {RegisterLoading ? (
+            <span className="loading mx-auto text-blue-600 loading-infinity loading-lg"></span>
+          ) : (
+            <h2 className=" text-2xl text-center font-semibold pt-5">
+              Please Register
+            </h2>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="card-body">
             <div className="form-control">
@@ -25,9 +56,10 @@ const Register = () => {
               </label>
               <input
                 type="text"
-                placeholder="text"
+                id="username"
+                placeholder="Enter Your Name"
                 className="h-12 bg-gray-50 p-2 border rounded focus:outline-none"
-                {...register("text", { required: true })}
+                {...register("username", { required: true })}
               />
               {errors.text && (
                 <span className="text-red-500">This field is required</span>
@@ -57,22 +89,19 @@ const Register = () => {
                 className="h-12 bg-gray-50 p-2 border rounded focus:outline-none"
                 {...register("password", {
                   required: true,
+                  minLength: 6,
+                  pattern: /^[^0-9][A-Za-z]+$/i,
                   maxLength: 20,
-                  minLength: 8,
-                  pattern: /^[A-Za-z]+$/i,
                 })}
               />
               {errors.password?.type === "required" && (
-              <p className=" text-red-700" role="alert">
-                Password is required
-              </p>
-            )}{" "}
+                <p className=" text-red-700" role="alert">
+                  Password is required
+                </p>
+              )}{" "}
               {errors.password?.type === "minLength" && (
-                <p className="text-red-600" role="alert" >Password must be 6 characters</p>
-              )}
-              {errors.password?.type === "maxLength" && (
                 <p className="text-red-600" role="alert">
-                  Password must be less than 20 characters
+                  Password must be 6 characters
                 </p>
               )}
               {errors.password?.type === "pattern" && (
@@ -81,7 +110,11 @@ const Register = () => {
                   and one special character.
                 </p>
               )}
-
+              {errors.password?.type === "maxLength" && (
+                <p className="text-red-600" role="alert">
+                  Password must be less than 20 characters
+                </p>
+              )}
               <p className="text-sm mt-2">
                 Already have an account ?{" "}
                 <a className="text-blue-600 underline" href="/login">
