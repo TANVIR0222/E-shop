@@ -4,7 +4,7 @@ import { getBaseURL } from '../../../utils/baseURL';
 const authApi = createApi({
     reducerPath: 'authApi',
     baseQuery : fetchBaseQuery({
-        baseUrl:`${getBaseURL()}/api/auth/`,
+        baseUrl:`${getBaseURL()}/api/auth`,
         credentials :  'include'
     }),
     endpoints:(builder) =>({
@@ -16,10 +16,10 @@ const authApi = createApi({
             })
         }),
         loginUser : builder.mutation({
-            query:(loginUsee) =>({
+            query:(credentials) =>({
                 url:'/login',
                 method:'POST',
-                body:loginUsee
+                body:credentials
             })
         })
     })
