@@ -8,6 +8,7 @@ const authApi = createApi({
         credentials :  'include'
     }),
     endpoints:(builder) =>({
+        // register 
         registerUser: builder.mutation({
             query:(newUser) => ({
                 url: '/register',
@@ -15,13 +16,21 @@ const authApi = createApi({
                 body: newUser
             })
         }),
+        // login user 
         loginUser : builder.mutation({
             query:(credentials) =>({
                 url:'/login',
                 method:'POST',
                 body:credentials
             })
-        })
+        }),
+        // logout 
+        logoutUser : builder.mutation({
+            query:()=>({
+                url:'/logout',
+                method:'POST'
+            })
+        }),
     })
 });
 
