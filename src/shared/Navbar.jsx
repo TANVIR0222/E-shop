@@ -1,14 +1,13 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Badge } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CartModel from "../page/Shop/CartModel";
-import { useLoginUserMutation, useLogoutUserMutation } from "../redux/features/auth/authApi";
+import {  useLogoutUserMutation } from "../redux/features/auth/authApi";
 import { logout } from "../redux/features/auth/authSlice";
 
 const navItem = [
@@ -31,7 +30,6 @@ const Navbar = () => {
   // show user login
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  console.log(user);
 
   // dropdown menu
   const [isDropdownOpen, setisDropdownOpen] = useState(false);

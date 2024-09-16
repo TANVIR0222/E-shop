@@ -20,8 +20,7 @@ const ShopingFiltering = ({
               type="radio"
               name=""
               id="category"
-              className="radio checked:bg-red-500" 
-              defaultChecked
+              className="radio checked:bg-red-500"
               value={category}
               checked={filterState.category === category}
               onChange={(e) =>
@@ -38,13 +37,12 @@ const ShopingFiltering = ({
         <h1 className=" font-medium text-lg">Color</h1>
         <hr />
         {filters.color.map((color, index) => (
-          <label key={index} className=" flex capitalize cursor-pointer">
+          <label key={index++} className=" flex capitalize cursor-pointer">
             <input
               type="radio"
               name="colors"
               id="colors"
-              className="radio checked:bg-red-500" 
-
+              className="radio checked:bg-red-500"
               value={color}
               checked={filterState.color === color}
               onChange={() => setFilterState({ ...filterState, color: color })}
@@ -59,23 +57,26 @@ const ShopingFiltering = ({
         <h1 className=" font-medium text-lg">Prices</h1>
         <hr />
         {filters.priceRange.map((range, index) => (
-          <label key={range} className=" flex capitalize cursor-pointer">
+          <label key={index} className=" flex capitalize cursor-pointer">
             <input
               type="radio"
               name="priceRange"
-              className="radio checked:bg-red-500" 
+              className="radio checked:bg-red-500"
               id="priceRange"
               value={`${range.min} - ${range.max}`}
               checked={filterState.priceRange === `${range.min} - ${range.max}`}
-              onChange={(e) => setFilterState({ ...filterState, priceRange: e.target.value })}
+              onChange={(e) =>
+                setFilterState({ ...filterState, priceRange: e.target.value })
+              }
             />
             <h1 className="ml-2 text-sm">{range.lable}</h1>
           </label>
         ))}
       </div>
 
-      <Button onClick={clearFilters} variant="contained">Clear All </Button>
-
+      <Button onClick={clearFilters} variant="contained">
+        Clear All{" "}
+      </Button>
     </div>
   );
 };

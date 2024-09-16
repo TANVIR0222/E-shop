@@ -3,7 +3,8 @@ import Navbar from "../shared/Navbar";
 import Footer from "../shared/Footer";
 
 const Main = () => {
-  const path = useLocation().pathname.includes("login") || useLocation().pathname.includes('register');
+  const location = useLocation()
+  const path =location .pathname.includes("login") || location.pathname.includes('register');
   return (
     <div>
       {path || <Navbar></Navbar>}
