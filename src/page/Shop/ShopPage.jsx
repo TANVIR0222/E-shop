@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import productData from "../../data/products.json";
+import { useState } from "react";
 import ProductCarts from "./ProductCarts";
 import ShopingFiltering from "./ShopingFiltering";
+import { useFetchAllProductsQuery } from "../../redux/features/products/productsApi";
 
 const filters = {
   category: ["all", "accessories", "dress", "jewellery", "cosmetics"],
@@ -15,46 +15,31 @@ const filters = {
 };
 
 const ShopPage = () => {
-  const [products, setProducts] = useState(productData);
+  
   const [filterState, setFilterState] = useState({
     category: "all",
     color: "all",
     priceRange: "",
+  })
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productPerPage] = useState(8);
+
+  const { category, color, priceRange } = filterState;
+  const [minPrice, maxPrice] = priceRange.split("-").map(Number);
+
+  const {
+    data: { products = [], totalpage = 0, totalProduct = 0 } = {}, // Ensure default values
+    error,
+    isLoading,
+  } = useFetchAllProductsQuery({
+    category: category !== "all" ? category : "", // Use empty string for better API handling
+    color: color !== "all" ? color : "",
+    minPrice: isNaN(minPrice) ? "" : minPrice, // Handle NaN values correctly
+    maxPrice: isNaN(maxPrice) ? "" : maxPrice,
+    page: currentPage,
+    limit: productPerPage,
   });
-
-  // filtering  products
-  const applyFilters = () => {
-    let filteredProducts = productData;
-
-    // filter by category
-    if (filterState.category && filterState.category !== "all") {
-      filteredProducts = filteredProducts.filter(
-        (product) => product.category === filterState.category
-      );
-    }
-
-    // color filtering
-    if (filterState.color && filterState.color !== "all") {
-      filteredProducts = filteredProducts.filter(
-        (product) => product.color === filterState.color
-      );
-    }
-
-    // filter by price range
-    if (filterState.priceRange) {
-      const [minPrice, maxPrice] = filterState.priceRange
-        .split("-")
-        .map(Number);
-      filteredProducts = filteredProducts.filter(
-        (product) => product.price >= minPrice && product.price <= maxPrice
-      );
-    }
-    setProducts(filteredProducts);
-  };
-
-  useEffect(() => {
-    applyFilters();
-  }, [filterState]);
 
   //   clear the filters
   const clearFilters = () => {
@@ -64,6 +49,10 @@ const ShopPage = () => {
       priceRange: "",
     });
   };
+
+  if (isLoading) return <div className="">Loading.........</div>;
+  if (error) return <div className="">Error Loading Product </div>;
+
   return (
     <>
       <section className="section__container bg-primary-light">
@@ -90,7 +79,7 @@ const ShopPage = () => {
           {/* right side */}
           <div className="">
             <h1 className=" text-xl font-medium mb-5">
-              Product Available: {products.length}{" "}
+              Product Available: {products?.length}
             </h1>
             <ProductCarts products={products} />
           </div>
